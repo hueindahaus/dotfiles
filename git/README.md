@@ -1,3 +1,9 @@
+# git
+
+## gitconfig
+1. Go to user specific dir
+2. Paste following in .gitconfig
+```
 [user]
     name = Alexander Huang
     email = alexanderhuangen@live.se
@@ -18,3 +24,4 @@
     cmd = code --wait $MERGED
 [pull]
     rebase = true
+```
