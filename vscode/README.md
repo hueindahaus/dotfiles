@@ -9,6 +9,6 @@
 ```
 [
     { "key": "ctrl+j", "command": "workbench.action.terminal.focus"},
-    { "key": "ctrl+j", "command": "workbench.action.focusActiveEditorGroup" "when": "terminalFocus"}
+    { "key": "ctrl+j", "command": "workbench.action.focusActiveEditorGroup", "when": "terminalFocus"}
 ]
 ```
