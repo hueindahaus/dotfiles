@@ -11,7 +11,7 @@
 [core]
     autocrlf = false
     safecrlf = true
-    editor = code --wait
+    editor = nvim -f
 [merge]
     conflictstyle = diff3
 [diff]
