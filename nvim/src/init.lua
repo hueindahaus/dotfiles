@@ -84,6 +84,23 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- Some utilities
+-- See https://stackoverflow.com/questions/1283388/how-to-merge-two-tables-overwriting-the-elements-which-are-in-both
+local function table_merge(t1, t2)
+	for k, v in pairs(t2) do
+		if type(v) == "table" then
+			if type(t1[k] or false) == "table" then
+				table_merge(t1[k] or {}, t2[k] or {})
+			else
+				t1[k] = v
+			end
+		else
+			t1[k] = v
+		end
+	end
+	return t1
+end
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -654,6 +671,10 @@ require("lazy").setup({
 				},
 			}
 
+			local linters = {
+				eslint_d = {},
+			}
+
 			-- Ensure the servers and tools above are installed
 			--  To check the current status of installed tools and/or manually install
 			--  other tools, you can run
@@ -664,12 +685,12 @@ require("lazy").setup({
 
 			-- You can add other tools here that you want Mason to install
 			-- for you, so that they are available from within Neovim.
-			local ensure_installed = vim.tbl_keys(servers or {})
+
+			local ensure_installed = vim.tbl_keys(table_merge(servers, linters) or {})
 			vim.list_extend(ensure_installed, {
 				"stylua", -- Used to format Lua code
 			})
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
-
 			require("mason-lspconfig").setup({
 				handlers = {
 					function(server_name)
@@ -684,7 +705,46 @@ require("lazy").setup({
 			})
 		end,
 	},
+	{ -- Linting
+		-- https://www.reddit.com/r/neovim/comments/15pj1oi/using_nvimlint_as_a_nullls_alternative_for_linters/
+		"mfussenegger/nvim-lint",
+		config = function()
+			local lint = require("lint")
 
+			lint.linters_by_ft = {
+				javascript = {
+					"eslint_d",
+				},
+				typescript = {
+					"eslint_d",
+				},
+				javascriptreact = {
+					"eslint_d",
+				},
+				typescriptreact = {
+					"eslint_d",
+				},
+			}
+
+			vim.api.nvim_create_autocmd({ "InsertLeave", "BufWritePost" }, {
+				callback = function()
+					lint.linters.eslint_d.args = {
+						-- "--fix-dry-run",
+						-- "--fix-type",
+						-- "problem",
+						"--format",
+						"json",
+						"--stdin",
+						"--stdin-filename",
+						function()
+							return vim.api.nvim_buf_get_name(0)
+						end,
+					}
+					lint.try_lint()
+				end,
+			})
+		end,
+	},
 	{ -- Autoformat
 		"stevearc/conform.nvim",
 		lazy = false,
@@ -714,6 +774,18 @@ require("lazy").setup({
 				lua = { "stylua" },
 				-- Conform can also run multiple formatters sequentially
 				python = { "isort", "black" },
+				javascript = {
+					"eslint_d",
+				},
+				typescript = {
+					"eslint_d",
+				},
+				javascriptreact = {
+					"eslint_d",
+				},
+				typescriptreact = {
+					"eslint_d",
+				},
 				--
 				-- You can use a sub-list to tell conform to run *until* a formatter
 				-- is found.
