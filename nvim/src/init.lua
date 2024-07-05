@@ -1086,7 +1086,12 @@ require("lazy").setup({
 			vim.g.loaded_netrw = 1
 			vim.g.loaded_netrwPlugin = 1
 			require("nvim-tree").setup({
-				filters = { dotfiles = true },
+				git = {
+					ignore = false,
+					enable = true,
+					timeout = 500,
+				},
+				filters = { dotfiles = false },
 				sort = {
 					sorter = "case_sensitive",
 				},
@@ -1094,6 +1099,7 @@ require("lazy").setup({
 				renderer = {
 					group_empty = true,
 				},
+				update_focused_file = { enable = true },
 			})
 		end,
 	},
