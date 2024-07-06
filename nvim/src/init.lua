@@ -20,7 +20,7 @@
 =====================================================================
 =====================================================================
 
-What is Kickstart?
+
 
   Kickstart.nvim is *not* a distribution.
 
@@ -68,7 +68,7 @@ Kickstart Guide:
 
   I have left several `:help X` comments throughout the init.lua
     These are hints about where to find more information about the relevant settings,
-    plugins or Neovim features used in Kickstart.
+
 
    NOTE: Look for lines like this
 
@@ -159,8 +159,13 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = "  ", trail = "·", nbsp = "␣" }
+-- vim.opt.list = true
+-- vim.opt.listchars = {
+-- 	tab = "  ",
+-- 	space = " ",
+-- 	trail = "·",
+-- 	nbsp = "␣",
+-- }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = "split"
@@ -267,15 +272,108 @@ require("lazy").setup({
 	-- See `:help gitsigns` to understand what the configuration keys do
 	{ -- Adds git related signs to the gutter, as well as utilities for managing changes
 		"lewis6991/gitsigns.nvim",
-		opts = {
-			signs = {
-				add = { text = "+" },
-				change = { text = "~" },
-				delete = { text = "_" },
-				topdelete = { text = "‾" },
-				changedelete = { text = "~" },
-			},
-		},
+		config = function()
+			require("gitsigns").setup({
+				signs = {
+					add = { text = "┃" },
+					change = { text = "┃" },
+					delete = { text = "_" },
+					topdelete = { text = "‾" },
+					changedelete = { text = "~" },
+					untracked = { text = "┆" },
+				},
+				signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
+				numhl = true, -- Toggle with `:Gitsigns toggle_numhl`
+				linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
+				word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
+				watch_gitdir = {
+					follow_files = true,
+				},
+				auto_attach = true,
+				attach_to_untracked = false,
+				on_attach = function(bufnr)
+					local gitsigns = require("gitsigns")
+
+					local function map(mode, l, r, opts)
+						opts = opts or {}
+						opts.buffer = bufnr
+						vim.keymap.set(mode, l, r, opts)
+					end
+
+					-- Navigation
+					map("n", "]c", function()
+						if vim.wo.diff then
+							vim.cmd.normal({ "]c", bang = true })
+						else
+							gitsigns.nav_hunk("next")
+						end
+					end)
+
+					map("n", "[c", function()
+						if vim.wo.diff then
+							vim.cmd.normal({ "[c", bang = true })
+						else
+							gitsigns.nav_hunk("prev")
+						end
+					end)
+
+					-- Actions
+					map("n", "<leader>Gs", gitsigns.stage_hunk)
+					map("n", "<leader>Gr", gitsigns.reset_hunk)
+					map("v", "<leader>Gs", function()
+						gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+					end)
+					map("v", "<leader>Gr", function()
+						gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+					end)
+					map("n", "<leader>GS", gitsigns.stage_buffer)
+					map("n", "<leader>Gu", gitsigns.undo_stage_hunk)
+					map("n", "<leader>GR", gitsigns.reset_buffer)
+					map("n", "<leader>Gp", gitsigns.preview_hunk)
+					map("n", "<leader>Gb", function()
+						gitsigns.blame_line({ full = true })
+					end)
+					map("n", "<leader>tGb", gitsigns.toggle_current_line_blame)
+					map("n", "<leader>Gd", gitsigns.diffthis)
+					map("n", "<leader>GD", function()
+						gitsigns.diffthis("~")
+					end)
+					map("n", "<leader>tGd", gitsigns.toggle_deleted)
+
+					-- Text object
+					-- map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
+				end,
+				current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+				current_line_blame_opts = {
+					virt_text = true,
+					virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
+					delay = 1000,
+					ignore_whitespace = false,
+					virt_text_priority = 100,
+				},
+				current_line_blame_formatter = "    <author>, <author_time:%R> - <summary>",
+				sign_priority = 6,
+				update_debounce = 100,
+				status_formatter = nil, -- Use default
+				max_file_length = 40000, -- Disable if file is longer than this (in lines)
+				preview_config = {
+					-- Options passed to nvim_open_win
+					border = "single",
+					style = "minimal",
+					relative = "cursor",
+					row = 0,
+					col = 1,
+				},
+			})
+			local c = require("vscode.colors").get_colors()
+			require("scrollbar.handlers.gitsigns").setup({
+				marks = {
+					GitAdd = { color = c.vscGitAdded },
+					GitChange = { color = c.vscModified },
+					GitDelete = { color = c.vscGitDeleted },
+				},
+			})
+		end,
 	},
 
 	-- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -307,11 +405,11 @@ require("lazy").setup({
 				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
 				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
 				["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-				["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
+				["<leader>h"] = { name = "[H]arpoon", _ = "which_key_ignore" },
 			})
 			-- visual mode
 			require("which-key").register({
-				["<leader>h"] = { "Git [H]unk" },
+				["<leader>G"] = { "[G]it Hunk" },
 			}, { mode = "v" })
 		end,
 	},
@@ -378,6 +476,7 @@ require("lazy").setup({
 					--   i = { ['<c-enter>'] = 'to_fuzzy_refine' },
 					-- },
 					layout_strategy = "vertical",
+					mappings = { i = { ["<esc>"] = require("telescope.actions").close } },
 				},
 				pickers = { find_files = {
 					hidden = true,
@@ -453,13 +552,21 @@ require("lazy").setup({
 					:find()
 			end
 
-			vim.keymap.set("n", "<C-e>", function()
+			vim.keymap.set("n", "<C-h>", function()
 				toggle_telescope(harpoon:list())
 			end, { desc = "Open harpoon window" })
 
-			vim.keymap.set("n", "<leader>a", function()
+			vim.keymap.set("n", "<leader>ha", function()
 				harpoon:list():add()
 			end, { desc = "Tag this to harpoon buffer" })
+
+			vim.keymap.set("n", "<leader>hd", function()
+				harpoon:list():remove()
+			end, { desc = "Remove this from harpoon buffer" })
+
+			vim.keymap.set("n", "<leader>hC", function()
+				harpoon:list():clear()
+			end, { desc = "Clear harpoon buffer" })
 		end,
 	},
 
@@ -642,8 +749,8 @@ require("lazy").setup({
 						},
 					},
 				},
-				isort = { version = "5.11.4" },
-				black = { version = "24.2.0" },
+				-- isort = { version = "5.11.4" },
+				-- black = { version = "24.2.0" },
 				-- ruff = {},
 				rust_analyzer = {},
 				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -690,6 +797,7 @@ require("lazy").setup({
 			vim.list_extend(ensure_installed, {
 				"stylua", -- Used to format Lua code
 			})
+			vim.list_extend(ensure_installed, { "debugpy" })
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 			require("mason-lspconfig").setup({
 				handlers = {
@@ -824,12 +932,15 @@ require("lazy").setup({
 			},
 			"saadparwaiz1/cmp_luasnip",
 
+			"onsails/lspkind.nvim",
 			-- Adds other completion capabilities.
 			--  nvim-cmp does not ship with all sources by default. They are split
 			--  into multiple repos for maintenance purposes.
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-nvim-lsp-signature-help",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-cmdline",
 		},
 		config = function()
 			-- See `:help cmp`
@@ -902,7 +1013,73 @@ require("lazy").setup({
 					{ name = "luasnip" },
 					{ name = "path" },
 					{ name = "nvim_lsp_signature_help" },
+					{ name = "buffer" },
 				},
+				sorting = {
+					-- TODO: Would be cool to add stuff like "See variable names before method names" in rust, or something like that.
+					comparators = {
+						cmp.config.compare.offset,
+						cmp.config.compare.exact,
+						cmp.config.compare.score,
+
+						-- copied from cmp-under, but I don't think I need the plugin for this.
+						-- I might add some more of my own.
+						function(entry1, entry2)
+							local _, entry1_under = entry1.completion_item.label:find("^_+")
+							local _, entry2_under = entry2.completion_item.label:find("^_+")
+							entry1_under = entry1_under or 0
+							entry2_under = entry2_under or 0
+							if entry1_under > entry2_under then
+								return false
+							elseif entry1_under < entry2_under then
+								return true
+							end
+						end,
+
+						cmp.config.compare.kind,
+						cmp.config.compare.sort_text,
+						cmp.config.compare.length,
+						cmp.config.compare.order,
+					},
+				},
+
+				formatting = {
+					-- Youtube: How to set up nice formatting for your sources.
+					format = require("lspkind").cmp_format({
+						with_text = true,
+						menu = {
+							buffer = "[buf]",
+							nvim_lsp = "[LSP]",
+							nvim_lua = "[api]",
+							path = "[path]",
+							luasnip = "[snip]",
+							gh_issues = "[issues]",
+							tn = "[TabNine]",
+							eruby = "[erb]",
+						},
+					}),
+				},
+			})
+			-- `/` cmdline setup
+			cmp.setup.cmdline("/", {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = {
+					{ name = "buffer" },
+				},
+			})
+			-- `:` cmdline setup
+			cmp.setup.cmdline(":", {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = cmp.config.sources({
+					{ name = "path" },
+				}, {
+					{
+						name = "cmdline",
+						option = {
+							ignore_cmds = { "Man", "!" },
+						},
+					},
+				}),
 			})
 		end,
 	},
@@ -935,17 +1112,17 @@ require("lazy").setup({
 			-- Simple and easy statusline.
 			--  You could remove this setup call if you don't like it,
 			--  and try some other statusline plugin
-			local statusline = require("mini.statusline")
+			-- local statusline = require("mini.statusline")
 			-- set use_icons to true if you have a Nerd Font
-			statusline.setup({ use_icons = vim.g.have_nerd_font })
+			-- statusline.setup({ use_icons = vim.g.have_nerd_font })
 
 			-- You can configure sections in the statusline by overriding their
 			-- default behavior. For example, here we set the section for
 			-- cursor location to LINE:COLUMN
 			---@diagnostic disable-next-line: duplicate-set-field
-			statusline.section_location = function()
-				return "%2l:%-2v"
-			end
+			-- statusline.section_location = function()
+			-- 	return "%2l:%-2v"
+			-- end
 
 			-- ... and there is more!
 			--  Check out: https://github.com/echasnovski/mini.nvim
@@ -1007,16 +1184,6 @@ require("lazy").setup({
 	--    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
 	-- { import = 'custom.plugins' },
 	{
-		"amitds1997/remote-nvim.nvim",
-		version = "*", -- Pin to GitHub releases
-		dependencies = {
-			"nvim-lua/plenary.nvim", -- For standard functions
-			"MunifTanjim/nui.nvim", -- To build the plugin UI
-			"nvim-telescope/telescope.nvim", -- For picking b/w different remote methods
-		},
-		config = true,
-	},
-	{
 		"christoomey/vim-tmux-navigator",
 		cmd = {
 			"TmuxNavigateLeft",
@@ -1065,6 +1232,7 @@ require("lazy").setup({
 					-- this supports the same val table as vim.api.nvim_set_hl
 					-- use colors from this colorscheme by requiring vscode.colors!
 					Cursor = { fg = c.vscDarkBlue, bg = c.vscLightGreen, bold = true },
+					GitSignsCurrentLineBlame = { fg = c.vscDimHighlight },
 				},
 			})
 		end,
@@ -1134,15 +1302,211 @@ require("lazy").setup({
 		},
 	},
 	{
-		"FabijanZulj/blame.nvim",
-		config = function()
-			require("blame").setup()
-		end,
-	},
-	{
 		"ThePrimeagen/harpoon",
 		branch = "harpoon2",
 		dependencies = { "nvim-lua/plenary.nvim" },
+	},
+	{
+		-- Debug adapter plug-in. Debug anything in Neovim
+		"mfussenegger/nvim-dap",
+		dependencies = { "mfussenegger/nvim-dap-python" },
+		config = function()
+			-- Enable overseer dap for efficient lazy loading ()
+			require("overseer").enable_dap()
+			require("dap.ext.vscode").load_launchjs()
+			require("dap-python").setup("python")
+
+			vim.keymap.set("n", "<leader>db", ":DapToggleBreakpoint<CR>")
+			vim.keymap.set("n", "<leader>d<space>", ":DapContinue<CR>")
+			vim.keymap.set("n", "<leader>dl", ":DapStepInto<CR>")
+			vim.keymap.set("n", "<leader>dj", ":DapStepOver<CR>")
+			vim.keymap.set("n", "<leader>dh", ":DapStepOut<CR>")
+			-- vim.keymap.set('n', '<leader>dz', ':ZoomWinTabToggle<CR>')
+			vim.keymap.set(
+				"n",
+				"<leader>dgt", -- dg as in debu[g] [t]race
+				":lua require('dap').set_log_level('TRACE')<CR>"
+			)
+			vim.keymap.set(
+				"n",
+				"<leader>dge", -- dg as in debu[g] [e]dit
+				function()
+					vim.cmd(":edit " .. vim.fn.stdpath("cache") .. "/dap.log")
+				end
+			)
+			vim.keymap.set("n", "<F1>", ":DapStepOut<CR>")
+			vim.keymap.set("n", "<F2>", ":DapStepOver<CR>")
+			vim.keymap.set("n", "<F3>", ":DapStepInto<CR>")
+			vim.keymap.set("n", "<leader>d-", function()
+				require("dap").restart()
+			end)
+			vim.keymap.set("n", "<leader>d_", function()
+				require("dap").terminate()
+				require("dapui").close()
+			end)
+		end,
+		lazy = true,
+	},
+	{
+		-- A default "GUI" front-end for nvim-dap
+		"rcarriga/nvim-dap-ui",
+		config = function()
+			require("dapui").setup()
+
+			-- Note: Added this <leader>dd duplicate of <F5> because somehow the <F5>
+			-- mapping keeps getting reset each time I restart nvim-dap. Annoying but whatever.
+			--
+			vim.keymap.set("n", "<leader>dd", function()
+				require("dapui").toggle()
+			end, { desc = "Toggle DapUI" })
+		end,
+		dependencies = {
+			"mfussenegger/nvim-dap",
+			"nvim-neotest/nvim-nio",
+		},
+	},
+	{
+		"stevearc/overseer.nvim",
+		config = function()
+			require("overseer").setup({
+				enable_dap = false,
+			})
+		end,
+	},
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		main = "ibl",
+		config = function()
+			require("ibl").setup({
+				indent = { highlight = { "IndentBlanklineSpaceChar" }, char = "│" },
+				scope = {
+					highlight = { "IndentBlanklineContextChar" },
+					show_start = false,
+					show_end = false,
+				},
+				exclude = {
+					filetypes = {
+						"help",
+						"terminal",
+						"starter",
+						"packer",
+						"lspinfo",
+						"TelescopePrompt",
+						"TelescopeResults",
+						"mason",
+						"checkhealth",
+						"gitcommit",
+						"",
+					},
+				},
+			})
+		end,
+	},
+	{
+		"nvim-lualine/lualine.nvim",
+		-- event = "VeryLazy",
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
+			"letieu/harpoon-lualine",
+		},
+		config = function()
+			-- LSP clients attached to buffer
+			local clients_lsp = function()
+				local bufnr = vim.api.nvim_get_current_buf()
+				---@diagnostic disable-next-line: deprecated
+				local clients = vim.lsp.buf_get_clients(bufnr)
+				if next(clients) == nil then
+					return ""
+				end
+
+				local c = {}
+				for _, client in pairs(clients) do
+					table.insert(c, client.name)
+				end
+				return "\u{f085} " .. table.concat(c, "|")
+			end
+
+			local branch = { "branch", icon = "" }
+			local mode = { "mode", icon = "󰡛" }
+			local diagnostics =
+				{ "diagnostics", symbols = { error = " ", warn = " ", info = " " }, colored = false }
+			local harpoon = {
+				"harpoon2",
+				icon = "♥",
+				indicators = { "1", "2", "3", "4" },
+				active_indicators = { "[1]", "[2]", "[3]", "[4]" },
+			}
+
+			require("lualine").setup({
+				options = {
+					icons_enabled = true,
+					theme = "vscode",
+					disabled_filetypes = {},
+					section_separators = {},
+					component_separators = {},
+					always_divide_middle = true,
+					globalstatus = false,
+				},
+				sections = {
+					lualine_a = { mode },
+					lualine_b = { branch, { "filename", path = 1 } },
+					lualine_c = { harpoon },
+					lualine_x = { diagnostics, "diff", "filetype" },
+					lualine_y = { "progress", "location" },
+					lualine_z = { clients_lsp },
+				},
+				inactive_sections = {
+					lualine_a = {},
+					lualine_b = {},
+					lualine_c = { { "filename", path = 1 } },
+					lualine_x = { "location" },
+					lualine_y = {},
+					lualine_z = {},
+				},
+				tabline = {},
+				extensions = {},
+			})
+		end,
+	},
+	{
+		"kevinhwang91/nvim-hlslens",
+		config = function()
+			require("hlslens").setup({
+				build_position_cb = function(plist, _, _, _)
+					require("scrollbar.handlers.search").handler.show(plist.start_pos)
+				end,
+			})
+			require("scrollbar.handlers.search").setup({
+				-- hlslens config overrides
+			})
+		end,
+	},
+	{
+		"petertriho/nvim-scrollbar",
+		dependencies = {
+			"kevinhwang91/nvim-hlslens",
+			"lewis6991/gitsigns.nvim",
+		},
+		config = function()
+			local c = require("vscode.colors").get_colors()
+
+			require("scrollbar").setup({
+				handle = { color = c.vscSplitThumb },
+				marks = {
+					Search = { color = c.vscYellowOrange },
+					Error = { color = c.vscRed },
+					Warn = { color = c.vscOrange },
+					Info = { color = c.vscLightBlue },
+					Hint = { color = c.vscGray },
+					Misc = { color = c.vscGray },
+					GitAdd = { color = c.vscGitAdded },
+					GitChange = { color = c.vscModified },
+					GitDelete = { color = c.vscGitDeleted },
+				},
+				show_in_active_only = true,
+			})
+		end,
 	},
 }, {
 	ui = {

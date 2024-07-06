@@ -1,0 +1,8 @@
+{
+	"detachKeys": "ctrl-z,z",
+	"plugins": {
+		"-x-cli-hints": {
+			"enabled": "true"
+		}
+	}
+}
