@@ -1,8 +1,9 @@
 --[[
 
-=====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
+=====================================================================
+=======                                                      ========
 ========                                    .-----.          ========
 ========         .----------------------.   | === |          ========
 ========         |.-""""""""""""""""""-.|   |-----|          ========
@@ -16,8 +17,7 @@
 ========        /::::::::::|  |::::::::::\  \ no mouse \     ========
 ========       /:::========|  |==hjkl==:::\  \ required \    ========
 ========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
+======================================================================
 =====================================================================
 
 
@@ -81,8 +81,7 @@ If you experience any errors while trying to install kickstart, run `:checkhealt
 I hope you enjoy your Neovim journey,
 - TJ
 
-P.S. You can delete this when you're done too. It's your config now! :)
---]]
+P.S. You can delete this when you're done too. It's your config now! :) --]]
 
 -- Some utilities
 -- See https://stackoverflow.com/questions/1283388/how-to-merge-two-tables-overwriting-the-elements-which-are-in-both
@@ -212,8 +211,8 @@ vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower win
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
 -- Indent block of text keymaps
-vim.keymap.set("v", "<S-Right>", ">gv")
-vim.keymap.set("v", "<S-Left>", "<gv")
+vim.keymap.set("v", "<A-l>", ">gv")
+vim.keymap.set("v", "<A-h>", "<gv")
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -552,7 +551,7 @@ require("lazy").setup({
 					:find()
 			end
 
-			vim.keymap.set("n", "<C-h>", function()
+			vim.keymap.set("n", "<leader>hh", function()
 				toggle_telescope(harpoon:list())
 			end, { desc = "Open harpoon window" })
 
@@ -1109,9 +1108,32 @@ require("lazy").setup({
 			-- - sr)'  - [S]urround [R]eplace [)] [']
 			require("mini.surround").setup()
 
+			require("mini.move").setup({
+				-- Module mappings. Use `''` (empty string) to disable one.
+				mappings = {
+					-- Move visual selection 't like it,
+					--  and try some other statusin Visual mode. Defaults are Alt (Meta) + hjkl.
+					left = "<Nop>",
+					right = "<Nop>",
+					down = "<A-j>",
+					up = "<A-k>",
+
+					-- Move currnilent line in Normal mode
+					line_left = "<A-h>",
+					line_right = "<A-l>",
+					line_down = "<A-j>",
+					line_up = "<A-k>",
+				},
+
+				-- Options which control moving behavior
+				options = {
+					-- Automatically reindent selection during linewise vertical move
+					reindent_linewise = true,
+				},
+			})
+
 			-- Simple and easy statusline.
-			--  You could remove this setup call if you don't like it,
-			--  and try some other statusline plugin
+			--  You could remove this setup call if you donline plugin
 			-- local statusline = require("mini.statusline")
 			-- set use_icons to true if you have a Nerd Font
 			-- statusline.setup({ use_icons = vim.g.have_nerd_font })
@@ -1450,7 +1472,10 @@ require("lazy").setup({
 				},
 				sections = {
 					lualine_a = { mode },
-					lualine_b = { branch, { "filename", path = 1 } },
+					lualine_b = {
+						branch,
+						-- { "filename", path = 1 }
+					},
 					lualine_c = { harpoon },
 					lualine_x = { diagnostics, "diff", "filetype" },
 					lualine_y = { "progress", "location" },
@@ -1459,7 +1484,9 @@ require("lazy").setup({
 				inactive_sections = {
 					lualine_a = {},
 					lualine_b = {},
-					lualine_c = { { "filename", path = 1 } },
+					lualine_c = {
+						-- { "filename", path = 1 }
+					},
 					lualine_x = { "location" },
 					lualine_y = {},
 					lualine_z = {},
@@ -1506,6 +1533,27 @@ require("lazy").setup({
 				},
 				show_in_active_only = true,
 			})
+		end,
+	},
+	{
+		"utilyre/barbecue.nvim",
+		name = "barbecue",
+		version = "*",
+		dependencies = {
+			"SmiteshP/nvim-navic",
+			"nvim-tree/nvim-web-devicons", -- optional dependency
+		},
+		opts = {
+			-- configurations go here
+		},
+	},
+	{
+		"mg979/vim-visual-multi",
+		branch = "master",
+		init = function()
+			vim.g.VM_maps = {
+				["Find Under"] = "<C-d>",
+			}
 		end,
 	},
 }, {
