@@ -1356,9 +1356,9 @@ require("lazy").setup({
 					vim.cmd(":edit " .. vim.fn.stdpath("cache") .. "/dap.log")
 				end
 			)
-			vim.keymap.set("n", "<F1>", ":DapStepOut<CR>")
-			vim.keymap.set("n", "<F2>", ":DapStepOver<CR>")
-			vim.keymap.set("n", "<F3>", ":DapStepInto<CR>")
+			-- vim.keymap.set("n", "<F1>", ":DapStepOut<CR>")
+			-- vim.keymap.set("n", "<F2>", ":DapStepOver<CR>")
+			-- vim.keymap.set("n", "<F3>", ":DapStepInto<CR>")
 			vim.keymap.set("n", "<leader>d-", function()
 				require("dap").restart()
 			end)
