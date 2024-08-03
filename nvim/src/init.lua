@@ -479,7 +479,7 @@ require("lazy").setup({
 				},
 				pickers = { find_files = {
 					hidden = true,
-					path_display = { "smart" },
+					path_display = { "truncate" },
 				} },
 				extensions = {
 					["ui-select"] = {
@@ -632,8 +632,16 @@ require("lazy").setup({
 					--  To jump back, press <C-t>.
 					map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
 
-					-- Find references for the word under your cursor.
-					map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+					local find_references = function()
+						-- Find references for the word under your cursor.
+						require("telescope.builtin").lsp_references({
+							show_line = true,
+							trim_text = true,
+							fname_width = 75,
+						})
+					end
+					map("gr", find_references, "[G]oto [R]eferences")
+					-- map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 
 					-- Jump to the implementation of the word under your cursor.
 					--  Useful when your language has ways of declaring types without an actual implementation.
@@ -781,6 +789,13 @@ require("lazy").setup({
 				eslint_d = {},
 			}
 
+			local formatters = {
+				-- JSON processor
+				jq = {},
+			}
+
+			local linters_and_formatters = table_merge(linters, formatters)
+
 			-- Ensure the servers and tools above are installed
 			--  To check the current status of installed tools and/or manually install
 			--  other tools, you can run
@@ -792,7 +807,7 @@ require("lazy").setup({
 			-- You can add other tools here that you want Mason to install
 			-- for you, so that they are available from within Neovim.
 
-			local ensure_installed = vim.tbl_keys(table_merge(servers, linters) or {})
+			local ensure_installed = vim.tbl_keys(table_merge(servers, linters_and_formatters) or {})
 			vim.list_extend(ensure_installed, {
 				"stylua", -- Used to format Lua code
 			})
@@ -836,9 +851,6 @@ require("lazy").setup({
 			vim.api.nvim_create_autocmd({ "InsertLeave", "BufWritePost" }, {
 				callback = function()
 					lint.linters.eslint_d.args = {
-						-- "--fix-dry-run",
-						-- "--fix-type",
-						-- "problem",
 						"--format",
 						"json",
 						"--stdin",
@@ -866,17 +878,21 @@ require("lazy").setup({
 			},
 		},
 		opts = {
-			notify_on_error = false,
-			format_on_save = function(bufnr)
-				-- Disable "format_on_save lsp_fallback" for languages that don't
-				-- have a well standardized coding style. You can add additional
-				-- languages here or re-enable it for the disabled ones.
-				local disable_filetypes = { c = true, cpp = true }
-				return {
-					timeout_ms = 500,
-					lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-				}
-			end,
+			notify_on_error = true,
+			-- format_on_save = function(bufnr)
+			-- 	-- Disable "format_on_save lsp_fallback" for languages that don't
+			-- 	-- have a well standardized coding style. You can add additional
+			-- 	-- languages here or re-enable it for the disabled ones.
+			-- 	-- local disable_filetypes = { c = true, cpp = true }
+			-- 	return {
+			-- 		timeout_ms = 500,
+			-- 		-- lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+			-- 		lsp_fallback = true,
+			-- 	}
+			-- end,
+			format_after_save = {
+				lsp_fallback = true,
+			},
 			formatters_by_ft = {
 				lua = { "stylua" },
 				-- Conform can also run multiple formatters sequentially
@@ -892,6 +908,9 @@ require("lazy").setup({
 				},
 				typescriptreact = {
 					"eslint_d",
+				},
+				json = {
+					"jq",
 				},
 				--
 				-- You can use a sub-list to tell conform to run *until* a formatter
@@ -1309,6 +1328,27 @@ require("lazy").setup({
 		config = true,
 		-- use opts = {} for passing setup options
 		-- this is equalent to setup({}) function
+	},
+	{
+		"windwp/nvim-ts-autotag",
+		config = function()
+			require("nvim-ts-autotag").setup({
+				opts = {
+					-- Defaults
+					enable_close = true, -- Auto close tags
+					enable_rename = true, -- Auto rename pairs of tags
+					enable_close_on_slash = false, -- Auto close on trailing </
+				},
+				-- Also override individual filetype configs, these take priority.
+				-- Empty by default, useful if one of the "opts" global settings
+				-- doesn't work well in a specific filetype
+				-- per_filetype = {
+				-- 	["html"] = {
+				-- 		enable_close = false,
+				-- 	},
+				-- },
+			})
+		end,
 	},
 	{
 		"numToStr/Comment.nvim",
