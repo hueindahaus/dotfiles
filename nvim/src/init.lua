@@ -394,22 +394,29 @@ require("lazy").setup({
 		"folke/which-key.nvim",
 		event = "VimEnter", -- Sets the loading event to 'VimEnter'
 		config = function() -- This is the function that runs, AFTER loading
-			require("which-key").setup()
+			local wk = require("which-key")
 
 			-- Document existing key chains
-			require("which-key").register({
-				["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-				["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-				["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
-				["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-				["<leader>h"] = { name = "[H]arpoon", _ = "which_key_ignore" },
+			wk.add({
+				{ "<leader>c", group = "[C]ode" },
+				--{ "<leader>c_", desc = "", hidden = true },
+				{ "<leader>d", group = "[D]ocument" },
+				--{ "<leader>d_", desc = "", hidden = true },
+				{ "<leader>h", group = "[H]arpoon" },
+				--{ "<leader>h_", desc = "", hidden = true },
+				{ "<leader>r", group = "[R]ename" },
+				--{ "<leader>r_", desc = "", hidden = true },
+				{ "<leader>s", group = "[S]earch" },
+				--{ "<leader>s_", desc = "", hidden = true },
+				{ "<leader>t", group = "[T]oggle" },
+				--{ "<leader>t_", desc = "", hidden = true },
+				{ "<leader>w", group = "[W]orkspace" },
+				--{ "<leader>w_", desc = "", hidden = true },
 			})
 			-- visual mode
-			require("which-key").register({
-				["<leader>G"] = { "[G]it Hunk" },
-			}, { mode = "v" })
+			wk.add({
+				{ "<leader>G", desc = "[G]it Hunk", mode = "v" },
+			})
 		end,
 	},
 
@@ -476,6 +483,9 @@ require("lazy").setup({
 					-- },
 					layout_strategy = "vertical",
 					mappings = { i = { ["<esc>"] = require("telescope.actions").close } },
+					layout_config = {
+						preview_cutoff = 1,
+					},
 				},
 				pickers = { find_files = {
 					hidden = true,
@@ -761,12 +771,14 @@ require("lazy").setup({
 				-- ruff = {},
 				rust_analyzer = {},
 				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-				--
-				-- Some languages (like typescript) have entire language plugins that can be useful:
-				--    https://github.com/pmizio/typescript-tools.nvim
-				--
-				-- But for many setups, the LSP (`tsserver`) will work just fine
-				tsserver = {},
+				ts_ls = {
+					init_options = {
+						preferences = {
+							importModuleSpecifierPreference = "relative",
+							importModuleSpecifierEnding = "minimal",
+						},
+					},
+				},
 				--
 
 				lua_ls = {
@@ -877,6 +889,23 @@ require("lazy").setup({
 				desc = "[F]ormat buffer",
 			},
 		},
+		init = function()
+			vim.api.nvim_create_user_command("FormatDisable", function(args)
+				if args.bang then
+					vim.b.disable_autoformat = true
+					vim.notify("Autoformatting has been disabled for current buffer", vim.log.levels.INFO)
+				else
+					vim.g.disable_autoformat = true
+					vim.notify("Autoformatting has been disabled globally", vim.log.levels.INFO)
+				end
+			end, { desc = "Disable autoformat-after-save. Add bang for disabling it for the buffer.", bang = true })
+
+			vim.api.nvim_create_user_command("FormatEnable", function()
+				vim.b.disable_autoformat = false
+				vim.g.disable_autoformat = false
+				vim.notify("Autoformatting has been enabled", vim.log.levels.INFO)
+			end, { desc = "Enable autoformat-on-save" })
+		end,
 		opts = {
 			notify_on_error = true,
 			-- format_on_save = function(bufnr)
@@ -890,9 +919,15 @@ require("lazy").setup({
 			-- 		lsp_fallback = true,
 			-- 	}
 			-- end,
-			format_after_save = {
-				lsp_fallback = true,
-			},
+			format_after_save = function(bufnr)
+				if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+					return
+				end
+
+				return {
+					lsp_fallback = true,
+				}
+			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
 				-- Conform can also run multiple formatters sequentially
@@ -1313,16 +1348,6 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"kylechui/nvim-surround",
-		version = "*", -- Use for stability; omit to use `main` branch for the latest features
-		event = "VeryLazy",
-		config = function()
-			require("nvim-surround").setup({
-				-- Configuration here, or leave empty to use defaults
-			})
-		end,
-	},
-	{
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
 		config = true,
@@ -1362,6 +1387,7 @@ require("lazy").setup({
 		cmd = {
 			"Git",
 		},
+		lazy = false,
 	},
 	{
 		"ThePrimeagen/harpoon",
@@ -1595,6 +1621,9 @@ require("lazy").setup({
 				["Find Under"] = "<C-d>",
 			}
 		end,
+	},
+	{
+		"rcarriga/nvim-notify",
 	},
 }, {
 	ui = {
