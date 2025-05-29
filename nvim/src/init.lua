@@ -955,6 +955,36 @@ require("lazy").setup({
 		},
 	},
 
+	{ -- copilot
+		"zbirenbaum/copilot-cmp",
+		dependencies = {
+			{ "hrsh7th/nvim-cmp" },
+			{
+				"zbirenbaum/copilot.lua",
+				cmd = "Copilot",
+				event = "InsertEnter",
+				config = function()
+					require("copilot").setup({
+						filetypes = {
+							python = true,
+							cpp = true,
+							cuda = true,
+							bazel = true,
+							["*"] = false,
+						},
+						server_opts_overrides = {},
+					})
+				end,
+			},
+		},
+		config = function()
+			require("copilot_cmp").setup({
+				suggestion = { enabled = false },
+				panel = { enabled = false },
+			})
+		end,
+	},
+
 	{ -- Autocompletion
 		"hrsh7th/nvim-cmp",
 		event = "InsertEnter",
@@ -1062,6 +1092,7 @@ require("lazy").setup({
 					--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
 				}),
 				sources = {
+					{ name = "copilot" },
 					{ name = "nvim_lsp" },
 					{ name = "luasnip" },
 					{ name = "path" },
