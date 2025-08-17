@@ -967,6 +967,7 @@ require("lazy").setup({
       require("conform").setup({
         notify_on_error = true,
         format_after_save = format_after_save,
+        formatters_by_ft = formatters_by_ft
       })
     end,
   },
