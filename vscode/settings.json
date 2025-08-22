@@ -1,8 +1,0 @@
-{
-	"workbench.sideBar.location": "right",
-	"extensions.recommendations":  [
-		"usernamehw.errorlens",
-		"eamodio.gitlens",
-		"vscodevim.vim"
-	]
-}

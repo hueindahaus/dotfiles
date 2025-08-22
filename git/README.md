@@ -14,14 +14,6 @@
     editor = nvim -f
 [merge]
     conflictstyle = diff3
-[diff]
-    tool = vscode
-[difftool "vscode"]
-    cmd = code --wait --diff $LOCAL $REMOTE
-[merge]
-    tool = vscode
-[mergetool "vscode"]
-    cmd = code --wait $MERGED
 [pull]
     rebase = true
 ```

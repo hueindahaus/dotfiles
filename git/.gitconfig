@@ -1,0 +1,12 @@
+[user]
+    name = Alexander Huang
+    email = alexanderhuangen@live.se
+    username = hueindahaus
+[core]
+    autocrlf = false
+    safecrlf = true
+    editor = nvim -f
+[merge]
+    conflictstyle = diff3
+[pull]
+    rebase = true
