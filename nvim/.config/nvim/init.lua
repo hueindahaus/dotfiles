@@ -605,10 +605,6 @@ require("lazy").setup({
 				opts = {},
 			},
 			{ "mason-org/mason-lspconfig.nvim" },
-			{
-				"WhoIsSethDaniel/mason-tool-installer.nvim",
-			},
-
 			-- Useful status updates for LSP.
 			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
 			{ "j-hui/fidget.nvim", opts = {} },
@@ -817,6 +813,11 @@ require("lazy").setup({
 						},
 					},
 				},
+
+				stylelint_lsp = {
+					filetypes = { "css", "scss", "typescriptreact", "javascriptreact" },
+					settings = { stylelintplus = { autoFixOnFormat = true, autoFixOnSave = true } },
+				},
 			}
 
 			-- Ensure the servers and tools above are installed
@@ -830,8 +831,8 @@ require("lazy").setup({
 			-- You can add other tools here that you want Mason to install
 			-- for you, so that they are available from within Neovim.
 
+			-- NOTE: Not used here. It is handled in mason-tool-installer
 			local ensure_installed = vim.tbl_keys(servers or {})
-
 			vim.list_extend(ensure_installed, { "debugpy" })
 
 			-- The following loop will configure each server with the capabilities we defined above.
@@ -843,37 +844,49 @@ require("lazy").setup({
 				require("lspconfig")[server_name].setup(server_config)
 				-- vim.lsp.config(server_name, config)
 			end
-
-			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 		end,
 	},
 	{ -- Linting
 		-- https://www.reddit.com/r/neovim/comments/15pj1oi/using_nvimlint_as_a_nullls_alternative_for_linters/
 		"mfussenegger/nvim-lint",
+		lazy = false,
+		dependencies = {
+			{
+				"mason-org/mason.nvim",
+				opts = {},
+			},
+			{ "mason-org/mason-lspconfig.nvim" },
+		},
 		config = function()
 			local lint = require("lint")
 
 			lint.linters_by_ft = {
 				javascript = {
 					"eslint_d",
+					-- "stylelint", -- css-in-js
 				},
 				typescript = {
 					"eslint_d",
+					-- "stylelint", -- css-in-js
 				},
 				javascriptreact = {
 					"eslint_d",
+					-- "stylelint", -- css-in-js
 				},
 				typescriptreact = {
 					"eslint_d",
+					-- "stylelint", -- css-in-js
+				},
+				css = {
+					"stylelint",
 				},
 			}
 
+			-- NOTE: Not used here. It is handled in mason-tool-installer
 			local ensure_installed = {}
 			for _, linters in pairs(lint.linters_by_ft) do
 				vim.list_extend(ensure_installed, linters)
 			end
-
-			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave", "BufWritePost" }, {
 				callback = function()
@@ -886,6 +899,19 @@ require("lazy").setup({
 							return vim.api.nvim_buf_get_name(0)
 						end,
 					}
+
+					-- lint.linters.stylelint.args = {
+					-- 	"--formatter",
+					-- 	"json",
+					-- 	"--custom-syntax",
+					-- 	"postcss-styled-syntax",
+					-- 	"--stdin",
+					-- 	"--stdin-filename",
+					-- 	function()
+					-- 		return vim.api.nvim_buf_get_name(0)
+					-- 	end,
+					-- }
+
 					lint.try_lint()
 				end,
 			})
@@ -947,12 +973,11 @@ require("lazy").setup({
 				-- javascript = { { "prettierd", "prettier" } },
 			}
 
+			-- NOTE: Not used here. It is handled in mason-tool-installer
 			local ensure_installed = {}
 			for _, formatters in pairs(formatters_by_ft) do
 				vim.list_extend(ensure_installed, formatters)
 			end
-
-			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			local format_after_save = function(bufnr)
 				if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
@@ -970,7 +995,33 @@ require("lazy").setup({
 			})
 		end,
 	},
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		lazy = false,
+		dependencies = {
+			{ "stevearc/conform.nvim" },
+			{ "mfussenegger/nvim-lint" },
+			{ "neovim/nvim-lspconfig" },
+		},
+		config = function()
+			conform = require("conform")
+			local ensure_installed = {}
+			for _, formatters in pairs(conform.formatters_by_ft) do
+				vim.list_extend(ensure_installed, formatters)
+			end
 
+			local lint = require("lint")
+			for _, linters in pairs(lint.linters_by_ft) do
+				vim.list_extend(ensure_installed, linters)
+			end
+
+			local lspconfig = require("lspconfig")
+			local servers = lspconfig.util.available_servers()
+			vim.list_extend(ensure_installed, servers)
+
+			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+		end,
+	},
 	{ -- copilot
 		"zbirenbaum/copilot-cmp",
 		dependencies = {
@@ -986,6 +1037,10 @@ require("lazy").setup({
 							cpp = true,
 							cuda = true,
 							bazel = true,
+							typescript = true,
+							typescriptreact = true,
+							javascript = true,
+							javascriptreact = true,
 							["*"] = false,
 						},
 						server_opts_overrides = {},
@@ -1052,6 +1107,9 @@ require("lazy").setup({
 					expand = function(args)
 						luasnip.lsp_expand(args.body)
 					end,
+				},
+				experimental = {
+					ghost_text = true, -- this feature conflict with copilot.vim's preview.
 				},
 				completion = { completeopt = "menu,menuone,noinsert" },
 
@@ -1269,6 +1327,7 @@ require("lazy").setup({
 				"typescript",
 				"tsx",
 				"javascript",
+				"css",
 			},
 			-- Autoinstall languages that are not installed
 			auto_install = true,
