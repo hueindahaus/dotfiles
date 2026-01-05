@@ -132,8 +132,32 @@ vim.opt.showmode = false
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.opt.clipboard = "unnamedplus"
-vim.api.nvim_set_option("clipboard", "unnamed")
+-- vim.opt.clipboard = "unnamedplus,unnamed"
+-- vim.api.nvim_set_option("clipboard", "unnamedplus,unnamed")
+
+-- Insanely ugly hack to get clipboard via OSC52 to work in wezterm. More info here: https://www.reddit.com/r/neovim/comments/1e9vllk/neovim_weird_issue_when_copypasting_using_osc_52/
+vim.o.clipboard = "unnamedplus"
+
+local function paste()
+	return {
+		vim.fn.split(vim.fn.getreg(""), "\n"),
+		vim.fn.getregtype(""),
+	}
+end
+
+vim.g.clipboard = {
+	name = "OSC 52",
+	copy = {
+		["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+		["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+	},
+	paste = {
+		["+"] = paste,
+		["*"] = paste,
+		-- ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+		-- ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+	},
+}
 
 -- Enable break indent
 vim.opt.breakindent = true
