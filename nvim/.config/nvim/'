@@ -916,43 +916,6 @@ require("lazy").setup({
 				vim.list_extend(ensure_installed, linters)
 			end
 
-			local find_eslint_config = function()
-				local depth = 20
-				local path = vim.api.nvim_buf_get_name(0)
-				local cwd = vim.loop.cwd()
-				while path do
-					depth = depth - 1
-
-					if depth < 0 then
-						break
-					end
-
-					local candidate = path .. "/eslint.config.js"
-
-					-- check if file exists
-					local stat = vim.loop.fs_stat(candidate)
-					if stat and stat.type == "file" then
-						-- vim.notify(candidate)
-						return candidate
-					end
-
-					-- stop if we've reached cwd
-					if path == cwd then
-						break
-					end
-
-					-- move up one directory
-					local parent = vim.fn.fnamemodify(path, ":h")
-					if parent == path then
-						break
-					end
-
-					path = parent
-				end
-
-				return nill
-			end
-
 			vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave", "BufWritePost" }, {
 				callback = function()
 					lint.linters.eslint_d.args = {
@@ -963,20 +926,11 @@ require("lazy").setup({
 						function()
 							return vim.api.nvim_buf_get_name(0)
 						end,
-						function()
-							local eslint_config_path = find_eslint_config()
-							if eslint_config_path == nill then
-								return ""
-							end
-							return "--config"
-						end,
-						function()
-							local eslint_config_path = find_eslint_config()
-							if eslint_config_path == nill then
-								return ""
-							end
-							return eslint_config_path
-						end,
+            "-c",
+            function()
+              local path = vim.api.nvim_buf_get_name(0)
+              local cwd = vim,uv.cwd()
+            end
 					}
 
 					-- lint.linters.stylelint.args = {
@@ -1598,6 +1552,8 @@ require("lazy").setup({
 		"mfussenegger/nvim-dap",
 		dependencies = { "mfussenegger/nvim-dap-python" },
 		config = function()
+			-- Enable overseer dap for efficient lazy loading ()
+			require("overseer").enable_dap()
 			require("dap.ext.vscode").load_launchjs()
 			require("dap-python").setup("python")
 
@@ -1649,6 +1605,14 @@ require("lazy").setup({
 			"mfussenegger/nvim-dap",
 			"nvim-neotest/nvim-nio",
 		},
+	},
+	{
+		"stevearc/overseer.nvim",
+		config = function()
+			require("overseer").setup({
+				enable_dap = false,
+			})
+		end,
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
