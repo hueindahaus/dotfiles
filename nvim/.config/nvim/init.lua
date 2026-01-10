@@ -1547,8 +1547,6 @@ require("lazy").setup({
 		"mfussenegger/nvim-dap",
 		dependencies = { "mfussenegger/nvim-dap-python" },
 		config = function()
-			-- Enable overseer dap for efficient lazy loading ()
-			require("overseer").enable_dap()
 			require("dap.ext.vscode").load_launchjs()
 			require("dap-python").setup("python")
 
@@ -1600,14 +1598,6 @@ require("lazy").setup({
 			"mfussenegger/nvim-dap",
 			"nvim-neotest/nvim-nio",
 		},
-	},
-	{
-		"stevearc/overseer.nvim",
-		config = function()
-			require("overseer").setup({
-				enable_dap = false,
-			})
-		end,
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
