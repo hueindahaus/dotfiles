@@ -254,6 +254,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
+vim.diagnostic.config({ virtual_text = true })
+
 require("lazy-config")
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
