@@ -18,7 +18,7 @@ config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.colors = {
   cursor_bg = "white",
   cursor_border = "white",
-  background = "#282828",
+  background = "#292017",
 }
 
 -- Overall appearance
