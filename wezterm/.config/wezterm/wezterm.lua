@@ -16,23 +16,24 @@ config.font = wezterm.font("JetBrainsMono Nerd Font")
 
 -- Colors
 config.colors = {
-	cursor_bg = "white",
-	cursor_border = "white",
+  cursor_bg = "white",
+  cursor_border = "white",
+  background = "#282828",
 }
 
 -- Overall appearance
 config.window_decorations = "RESIZE"
 -- config.hide_tab_bar_if_only_one_tab = true -- Setting this will make the window hard to grab
-config.window_background_image = constants.bg_image
-config.macos_window_background_blur = 40
-config.win32_system_backdrop = "Acrylic"
+-- config.window_background_image = constants.bg_image
+-- config.macos_window_background_blur = 40
+-- config.win32_system_backdrop = "Acrylic"
+-- config.window_background_opacity = 0.8
 config.window_padding = {
-	left = 0,
-	right = 0,
-	top = 0,
-	bottom = 0,
+  left = 0,
+  right = 0,
+  top = 0,
+  bottom = 0,
 }
-config.window_background_opacity = 0.8
 
 -- Misc settings
 config.max_fps = 120
@@ -40,7 +41,7 @@ config.prefer_egl = true
 
 -- Custom commands
 wezterm.on("augment-command-palette", function()
-	return commands
+  return commands
 end)
 
 -- Finally, return the configuration to wezterm:
