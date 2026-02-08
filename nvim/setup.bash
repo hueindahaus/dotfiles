@@ -8,4 +8,5 @@ then
 # sudo snap install --beta nvim --classic
 sudo apt install zip
 sudo apt install ripgrep
+curl -fsSL https://opencode.ai/install | bash
 fi

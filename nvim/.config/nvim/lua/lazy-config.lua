@@ -48,6 +48,7 @@ require("lazy").setup({
   require("plugins.barbecue"),
   require("plugins.vim-visual-multi"),
   require("plugins.nvim-notify"),
+  require("plugins.opencode"),
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the

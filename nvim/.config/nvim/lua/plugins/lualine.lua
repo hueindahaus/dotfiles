@@ -49,6 +49,9 @@ return {
           -- { "filename", path = 1 }
         },
         lualine_c = { harpoon },
+        lualine_v = {
+          require("opencode").statusline,
+        },
         lualine_x = { diagnostics, "diff", "filetype" },
         lualine_y = { "progress", "location" },
         lualine_z = { clients_lsp },
