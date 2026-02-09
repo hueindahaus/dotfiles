@@ -49,10 +49,10 @@ vim.g.clipboard = {
     ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
   },
   paste = {
-    ["+"] = paste,
-    ["*"] = paste,
-    -- ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-    -- ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    -- ["+"] = paste,
+    -- ["*"] = paste,
   },
 }
 
@@ -105,7 +105,7 @@ vim.opt.scrolloff = 10
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+-- vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>") -- This is done further down. Esc is used for many purposes
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
@@ -118,7 +118,7 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -255,6 +255,18 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 vim.diagnostic.config({ virtual_text = true })
+
+-- Close popup windows with ESC
+vim.keymap.set("n", "<Esc>", function()
+  local win = vim.api.nvim_get_current_win()
+  local config = vim.api.nvim_win_get_config(win)
+  if config.relative ~= "" then
+    vim.api.nvim_win_close(win, true)
+  else
+    -- Default ESC behavior (clear search highlight)
+    vim.cmd("nohlsearch")
+  end
+end, { desc = "Close popup or clear search highlight" })
 
 require("lazy-config")
 -- The line beneath this is called `modeline`. See `:help modeline`

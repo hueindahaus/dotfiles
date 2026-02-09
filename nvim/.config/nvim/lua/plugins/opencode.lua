@@ -1,5 +1,33 @@
+-- opencode.nvim plugin configuration for lazy.nvim
+-- Provides AI coding assistance via opencode CLI integration.
+-- Includes path-based blacklisting to disable the plugin in specific directories.
+
+-- Paths where opencode.nvim should be disabled
+local blacklisted_paths = {
+  -- Add paths here, e.g.:
+  -- vim.fn.expand("~/work/restricted-project"),
+  -- "/home/user/sensitive-repo",
+  -- Zenseact repos that should be restricted
+  "/home/s0001701/workspaces",
+}
+
+local function is_blacklisted()
+  local cwd = vim.fn.getcwd()
+  for _, path in ipairs(blacklisted_paths) do
+    -- Check if cwd is or is a subpath of the blacklisted path
+    if cwd == path or cwd:sub(1, #path + 1) == path .. "/" then
+      vim.notify("opencode.nvim disabled: cwd is in blacklisted path (" .. path .. ")", vim.log.levels.WARN)
+      return true
+    end
+  end
+  return false
+end
+
 return {
   "nickjvandyke/opencode.nvim",
+  cond = function()
+    return not is_blacklisted()
+  end,
   dependencies = {
     -- Recommended for `ask()` and `select()`.
     -- Required for `snacks` provider.
@@ -31,7 +59,6 @@ return {
     vim.keymap.set({ "n", "t" }, "<C-.>", function()
       require("opencode").toggle()
     end, { desc = "Toggle opencode" })
-
 
     vim.keymap.set("n", "<S-C-u>", function()
       require("opencode").command("session.half.page.up")

@@ -4,6 +4,7 @@ return {
   dependencies = {
     "nvim-tree/nvim-web-devicons",
     "letieu/harpoon-lualine",
+    "nickjvandyke/opencode.nvim",
   },
   config = function()
     -- LSP clients attached to buffer
@@ -31,6 +32,11 @@ return {
       indicators = { "1", "2", "3", "4" },
       active_indicators = { "[1]", "[2]", "[3]", "[4]" },
     }
+    local opencode_statusline = nil
+    local ok, opencode = pcall(require, "opencode")
+    if ok and opencode then
+      opencode_statusline = opencode.statusline
+    end
 
     require("lualine").setup({
       options = {
@@ -49,9 +55,10 @@ return {
           -- { "filename", path = 1 }
         },
         lualine_c = { harpoon },
-        lualine_v = {
-          require("opencode").statusline,
-        },
+        lualine_v = { opencode_statusline },
+        -- {
+        --   require("opencode").statusline,
+        -- },
         lualine_x = { diagnostics, "diff", "filetype" },
         lualine_y = { "progress", "location" },
         lualine_z = { clients_lsp },
