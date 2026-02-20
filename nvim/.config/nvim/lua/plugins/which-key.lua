@@ -20,7 +20,9 @@ return { -- Useful plugin to show you pending keybinds.
       --{ "<leader>t_", desc = "", hidden = true },
       { "<leader>w", group = "[W]orkspace" },
       --{ "<leader>w_", desc = "", hidden = true },
+      { "<leader>o", group = "[O]pencode" },
     })
+
     -- visual mode
     wk.add({
       { "<leader>G", desc = "[G]it Hunk", mode = "v" },

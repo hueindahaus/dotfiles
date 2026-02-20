@@ -14,7 +14,7 @@ return { -- Highlight, edit, and navigate code
       -- In general try to only put file types which are not covered by LSP
       .install({
         "bash",
-        -- "c", -- Probably not needed but maybe useful for zenseact src repo
+        "c", -- Probably not needed but maybe useful for zenseact src repo
         "diff",
         "html",
         "lua",
