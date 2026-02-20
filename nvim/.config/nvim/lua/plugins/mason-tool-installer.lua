@@ -6,7 +6,7 @@ return {
   --   "mfussenegger/nvim-lint",
   -- },
   config = function()
-    local ensure_installed = {}
+    local ensure_installed = { "tree-sitter-cli", }
     -- conform = require("conform")
     -- for _, formatters in pairs(conform.formatters_by_ft) do
     --   vim.list_extend(ensure_installed, formatters)

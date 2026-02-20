@@ -10,19 +10,33 @@ return { -- Highlight, edit, and navigate code
 
     require("nvim-treesitter").setup(opts)
 
+
     require("nvim-treesitter")
-      -- In general try to only put file types which are not covered by LSP
-      .install({
-        "bash",
-        "c", -- Probably not needed but maybe useful for zenseact src repo
-        "diff",
-        "html",
-        "lua",
-        "luadoc",
-        "markdown",
-        "vim",
-        "vimdoc",
-      })
-      :wait(300000) -- wait max 5 minutes
+    -- In general try to only put file types which are not covered by LSP
+        .install({
+          "bash",
+          "c",
+          "cpp",
+          "cuda",
+          "diff",
+          "html",
+          "lua",
+          "luadoc",
+          "markdown",
+          "vim",
+          "vimdoc",
+          "python",
+          "javascript",
+          "jsx",
+          "typescript",
+          "tsx",
+          "css",
+          "json",
+          "sql",
+          "rust",
+          "zig",
+          "dockerfile"
+        })
+        :wait(300000) -- wait max 5 minutes
   end,
 }
