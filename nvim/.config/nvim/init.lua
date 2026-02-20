@@ -163,7 +163,20 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 -- Copy path
 vim.api.nvim_create_user_command("CopyPath", function()
   local path = vim.fn.expand("%:p")
-  vim.fn.setreg("+", path)
+  local cwd = vim.fn.getcwd() .. "/"
+
+  local function escape_pattern(text)
+    return text:gsub("([^%w])", "%%%1")
+  end
+
+  local function replace_subpath(p, old_subpath, new_subpath)
+    old_subpath = escape_pattern(old_subpath)
+    return p:gsub(old_subpath, new_subpath)
+  end
+
+  path = replace_subpath(path, cwd, "")
+
+  vim.fn.setreg("+", path) -- path)
   vim.notify('Copied "' .. path .. '" to the clipboard!')
 end, {})
 vim.keymap.set("n", "<leader>yp", ":CopyPath<CR>", { desc = "Copy current path" })
