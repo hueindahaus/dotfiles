@@ -5,7 +5,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
   dependencies = {
     "nvim-lua/plenary.nvim",
     "ThePrimeagen/harpoon", -- local dependency
-    { -- If encountering errors, see telescope-fzf-native README for installation instructions
+    {                       -- If encountering errors, see telescope-fzf-native README for installation instructions
       "nvim-telescope/telescope-fzf-native.nvim",
 
       -- `build` is used to run some command when the plugin is installed/updated.
@@ -19,9 +19,8 @@ return { -- Fuzzy Finder (files, lsp, etc)
       end,
     },
     { "nvim-telescope/telescope-ui-select.nvim" },
-
     -- Useful for getting pretty icons, but requires a Nerd Font.
-    { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+    { "nvim-tree/nvim-web-devicons",            enabled = vim.g.have_nerd_font },
   },
   config = function()
     -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -81,7 +80,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
     vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
     vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
-    vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
+    vim.keymap.set("n", "<leader>st", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
     vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
     vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
     vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
@@ -124,15 +123,15 @@ return { -- Fuzzy Finder (files, lsp, etc)
       end
 
       require("telescope.pickers")
-        .new({}, {
-          prompt_title = "Harpoon",
-          finder = require("telescope.finders").new_table({
-            results = file_paths,
-          }),
-          previewer = conf.file_previewer({}),
-          sorter = conf.generic_sorter({}),
-        })
-        :find()
+          .new({}, {
+            prompt_title = "Harpoon",
+            finder = require("telescope.finders").new_table({
+              results = file_paths,
+            }),
+            previewer = conf.file_previewer({}),
+            sorter = conf.generic_sorter({}),
+          })
+          :find()
     end
 
     vim.keymap.set("n", "<leader>hh", function()
@@ -151,8 +150,6 @@ return { -- Fuzzy Finder (files, lsp, etc)
       harpoon:list():clear()
     end, { desc = "Clear harpoon buffer" })
 
-    -- In this case, we create a function that lets us more easily define mappings specific
-    -- for LSP related items. It sets the mode, buffer and description for us each time.
     local map = function(keys, func, desc)
       vim.keymap.set("n", keys, func, { desc = "LSP: " .. desc })
     end
@@ -180,14 +177,14 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- Jump to the type of the word under your cursor.
     --  Useful when you're not sure what type a variable is and you want to see
     --  the definition of its *type*, not where it was *defined*.
-    map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+    map("gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype Definition")
 
     -- Fuzzy find all the symbols in your current document.
     --  Symbols are things like variables, functions, types, etc.
-    map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+    map("<leader>ss", require("telescope.builtin").lsp_document_symbols, "Search Symbols")
 
     -- Fuzzy find all the symbols in your current workspace.
     --  Similar to document symbols, except searches over your entire project.
-    map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+    -- map("<leader>sw", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[S]earch [W]orkspace [S]ymbols")
   end,
 }

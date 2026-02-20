@@ -187,7 +187,7 @@ vim.lsp.enable(lsp_servers)
 --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
 --    function will be executed to configure the current buffer
 vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+  group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
   callback = function(args)
     local map = function(keys, func, desc)
       vim.keymap.set("n", keys, func, { buffer = args.buf, desc = "LSP: " .. desc })
@@ -234,7 +234,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
 
       vim.api.nvim_create_autocmd("LspDetach", {
-        group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+        group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
         callback = function(event2)
           vim.lsp.buf.clear_references()
           vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
@@ -250,6 +250,20 @@ vim.api.nvim_create_autocmd("LspAttach", {
       map("<leader>th", function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = nil }))
       end, "[T]oggle Inlay [H]ints")
+    end
+
+
+    -- Auto-format ("lint") on save.
+    -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
+    if not client:supports_method('textDocument/willSaveWaitUntil')
+        and client:supports_method('textDocument/formatting') then
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        group = vim.api.nvim_create_augroup('lsp-format', { clear = false }),
+        buffer = args.buf,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = args.buf, id = client.id, timeout_ms = 1000 })
+        end,
+      })
     end
   end,
 })

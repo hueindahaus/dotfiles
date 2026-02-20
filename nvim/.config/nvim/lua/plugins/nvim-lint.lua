@@ -13,6 +13,9 @@ return { -- Linting
     local lint = require("lint")
 
     lint.linters_by_ft = {
+      python = {
+        "pylint",
+      },
       javascript = {
         "eslint_d",
         -- "stylelint", -- css-in-js
