@@ -265,6 +265,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
       end, "[T]oggle Inlay [H]ints")
     end
 
+    -- Enable auto-completion
+    if client:supports_method('textDocument/completion') then
+      vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+    end
 
     -- Auto-format ("lint") on save.
     -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
