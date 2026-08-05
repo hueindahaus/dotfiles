@@ -8,7 +8,7 @@ local blacklisted_paths = {
   -- vim.fn.expand("~/work/restricted-project"),
   -- "/home/user/sensitive-repo",
   -- Zenseact repos that should be restricted
-  "/home/s0001701/workspaces",
+  -- "/home/s0001701/workspaces",
 }
 
 local function is_blacklisted()
