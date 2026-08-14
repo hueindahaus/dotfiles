@@ -134,13 +134,20 @@ vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left wind
 vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
-vim.keymap.set("n", "<C-m>", function()
-  if vim.api.nvim_buf_get_name(0) == "NvimTree_1" then
-    vim.call("<C-w><C-p>")
+vim.keymap.set("n", "<C-y>", function()
+  local current_buf = vim.api.nvim_buf_get_name(0)
+  if current_buf:match("NvimTree_") then
+    -- Already in NvimTree, go to previous window
+    vim.cmd("wincmd p")
   else
-    vim.cmd('exe bufnr("NvimTree_1") .. "wincmd w"')
+    -- Find the window containing NvimTree and switch to it
+    local nvimtree_winnr = vim.fn.bufwinnr("NvimTree_1")
+    if nvimtree_winnr ~= -1 then
+      vim.cmd(nvimtree_winnr .. "wincmd w")
+    end
   end
 end, { desc = "Move focus between nvim-tree/editor" })
+
 
 -- Indent block of text keymaps
 vim.keymap.set("v", "<A-l>", ">gv")
@@ -180,6 +187,43 @@ vim.api.nvim_create_user_command("CopyPath", function()
   vim.notify('Copied "' .. path .. '" to the clipboard!')
 end, {})
 vim.keymap.set("n", "<leader>yp", ":CopyPath<CR>", { desc = "Copy current path" })
+
+-- Quickfix stuff
+local function is_quickfix_open()
+  for _, win in ipairs(vim.fn.getwininfo()) do
+    if win.quickfix == 1 then
+      return true
+    end
+  end
+  return false
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function()
+    vim.cmd("wincmd L")
+    vim.cmd("vertical resize 80") -- optional: set width
+  end,
+})
+
+-- <C-n> and <C-p>
+vim.keymap.set("n", "<C-n>", function()
+  if is_quickfix_open() then
+    pcall(vim.cmd, "cnext")
+  else
+    -- Default <C-n> behavior (move down one line)
+    vim.cmd("normal! j")
+  end
+end, { desc = "Next quickfix entry or move down" })
+
+vim.keymap.set("n", "<C-p>", function()
+  if is_quickfix_open() then
+    pcall(vim.cmd, "cprev")
+  else
+    -- Default <C-p> behavior (move up one line)
+    vim.cmd("normal! k")
+  end
+end, { desc = "Prev quickfix entry or move up" })
 
 -- [[ LSP ]]
 vim.lsp.config("*", {

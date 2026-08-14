@@ -53,7 +53,14 @@ return { -- Fuzzy Finder (files, lsp, etc)
         --   i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         -- },
         layout_strategy = "vertical",
-        mappings = { i = { ["<esc>"] = require("telescope.actions").close } },
+        mappings = {
+          i = {
+            ["<esc>"] = require("telescope.actions").close,
+            ["<C-q>"] = require("telescope.actions").send_to_qflist + -- Send to quickfix list
+                require("telescope.actions")
+                .open_qflist
+          }
+        },
         layout_config = {
           preview_cutoff = 1,
         },
