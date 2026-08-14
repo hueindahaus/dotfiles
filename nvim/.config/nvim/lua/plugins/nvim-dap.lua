@@ -3,7 +3,6 @@ return {
   "mfussenegger/nvim-dap",
   dependencies = { "mfussenegger/nvim-dap-python" },
   config = function()
-    require("dap.ext.vscode").load_launchjs()
     require("dap-python").setup("python")
     local dap = require("dap")
     local ui = require("dapui")

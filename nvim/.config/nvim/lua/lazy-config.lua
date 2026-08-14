@@ -29,7 +29,7 @@ require("lazy").setup({
   -- require("plugins.conform"),
   require("plugins.mason-tool-installer"),
   require("plugins.copilot"),
-  require("plugins.nvim-cmp"),
+  -- require("plugins.nvim-cmp"),
   require("plugins.mini"),
   require("plugins.nvim-treesitter"),
   require("plugins.vim-tmux-navigator"),

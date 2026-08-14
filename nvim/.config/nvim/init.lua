@@ -100,6 +100,13 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+
+-- This hides the command line. It only appears when you
+-- * Enter command mode (:)
+-- * Search (/ or ?)
+-- * See a message
+vim.opt.cmdheight = 0
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 

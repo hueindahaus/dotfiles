@@ -63,6 +63,8 @@ return { -- Fuzzy Finder (files, lsp, etc)
         },
         layout_config = {
           preview_cutoff = 1,
+          width = 0.9,
+          height = { padding = 0 }
         },
       },
       pickers = {

@@ -31,6 +31,7 @@ return {
         -- use colors from this colorscheme by requiring vscode.colors!
         Cursor = { fg = c.vscDarkBlue, bg = c.vscLightGreen, bold = true },
         GitSignsCurrentLineBlame = { fg = c.vscDimHighlight },
+        NotifyBackground = { bg = c.vscBack }
       },
     })
   end,
