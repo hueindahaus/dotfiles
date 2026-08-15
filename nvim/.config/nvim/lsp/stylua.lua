@@ -1,4 +1,4 @@
-return {
-  cmd = { "stylua" },
-  filetypes = { "lua" },
-}
+-- return {
+--   cmd = { "stylua" },
+--   filetypes = { "lua" },
+-- }
