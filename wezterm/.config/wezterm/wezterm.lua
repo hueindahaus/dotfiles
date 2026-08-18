@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local constants = require("constants")
 local commands = require("commands")
+local act = wezterm.action
 
 -- This will hold the configuration.
 local config = wezterm.config_builder()
@@ -43,6 +44,12 @@ config.prefer_egl = true
 wezterm.on("augment-command-palette", function()
   return commands
 end)
+
+-- key maps
+config.keys = {
+  { key = 'h', mods = 'CTRL|SHIFT', action = act.ActivateTabRelative(-1) },
+  { key = 'l', mods = 'CTRL|SHIFT', action = act.ActivateTabRelative(1) },
+}
 
 -- Finally, return the configuration to wezterm:
 return config
