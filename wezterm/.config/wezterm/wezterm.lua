@@ -12,7 +12,7 @@ config.initial_rows = 28
 
 -- Font settings
 config.font_size = 12
-config.line_height = 1.2
+-- config.line_height = 1.2
 config.font = wezterm.font("JetBrainsMono Nerd Font")
 
 -- Colors

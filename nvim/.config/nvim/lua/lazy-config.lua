@@ -50,6 +50,7 @@ require("lazy").setup({
   require("plugins.vim-visual-multi"),
   require("plugins.nvim-notify"),
   require("plugins.opencode"),
+  --require("plugins.smear-cursor"),
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
