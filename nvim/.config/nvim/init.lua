@@ -151,9 +151,25 @@ vim.keymap.set("n", "<C-y>", function()
     local nvimtree_winnr = vim.fn.bufwinnr("NvimTree_1")
     if nvimtree_winnr ~= -1 then
       vim.cmd(nvimtree_winnr .. "wincmd w")
+    else
+      -- NvimTree is not open, open it and focus it
+      require("nvim-tree.api").tree.open()
     end
   end
 end, { desc = "Move focus between nvim-tree/editor" })
+-- vim.keymap.set("n", "<C-y>", function()
+--   local current_buf = vim.api.nvim_buf_get_name(0)
+--   if current_buf:match("NvimTree_") then
+--     -- Already in NvimTree, go to previous window
+--     vim.cmd("wincmd p")
+--   else
+--     -- Find the window containing NvimTree and switch to it
+--     local nvimtree_winnr = vim.fn.bufwinnr("NvimTree_1")
+--     if nvimtree_winnr ~= -1 then
+--       vim.cmd(nvimtree_winnr .. "wincmd w")
+--     end
+--   end
+-- end, { desc = "Move focus between nvim-tree/editor" })
 
 
 -- Indent block of text keymaps

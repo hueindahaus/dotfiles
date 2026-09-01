@@ -37,8 +37,9 @@ config.window_padding = {
 }
 
 -- Misc settings
-config.max_fps = 120
+config.max_fps = 60
 config.prefer_egl = true
+config.use_ime = false
 
 -- Custom commands
 wezterm.on("augment-command-palette", function()
